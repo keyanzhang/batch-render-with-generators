@@ -1,3 +1,5 @@
+import invariant from 'invariant'
+
 export const randomInt = (l, r) => l + Math.random() * (r - l) | 0
 
 export const genRgbPalette = (br, bg, bb) => {
@@ -27,6 +29,8 @@ export function* genNextElement(seq, select) {
 
   while (rightBound) {
     i = select(rightBound, prevElem)
+    invariant(i < rightBound, `invalid index ${i}, current upper bound ${rightBound}`)
+
     rightBound--
 
     let tmp = seq[i]
@@ -39,7 +43,7 @@ export function* genNextElement(seq, select) {
   }
 }
 
-const posToIndex = (data) => {
-  // [42, 25, 33, 255]
-
+export const posToIndex = (data) => {
+  const [x, y] = data
+  return (511 - x) * 512 + (511 - y) * 1
 }

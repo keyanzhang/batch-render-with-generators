@@ -1,5 +1,5 @@
 import { genNextBatchRender } from './view/canvas'
-import { randomInt } from './algorithm'
+import { randomInt, posToIndex } from './algorithm'
 
 import styles from './index.css'
 
@@ -12,12 +12,15 @@ rootEl.classList.add(styles.app)
 controlEl.classList.add(styles.control)
 buttonEl.classList.add(styles.switchButton)
 
-let defaultFn = (rightBound, prevElem) => rightBound - 1
+let ops = [
+  (rightBound, prevElem) => rightBound - 1,
+  (rightBound, prevElem) => randomInt(0, rightBound),
+]
 
 let renderer = genNextBatchRender(
   canvasEl,
-  (rightBound, prevElem) => rightBound - 1,
-  (rightBound, prevElem) => rightBound - 1,
+  ops[0], // color selecting function
+  ops[0], // pos selecting function
   1000,
 )
 
@@ -31,15 +34,19 @@ const doRender = () => {
 
 doRender()
 
+let opIdx = 0
+
 buttonEl.onclick = (e) => {
   if (renderer) {
     renderer.return() // cancels the current task
   }
 
+  opIdx = randomInt(0, 10)
+
   renderer = genNextBatchRender(
     canvasEl,
-    (rightBound, prevElem) => randomInt(0, rightBound),
-    (rightBound, prevElem) => randomInt(0, rightBound),
+    ops[opIdx % ops.length], // color selecting function
+    ops[opIdx % ops.length], // pos selecting function
     1000,
   )
 

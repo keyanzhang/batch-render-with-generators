@@ -1,1 +1,1 @@
-# all-rgb-colors-in-one-canvas
+# batch-render-with-generators

@@ -5,14 +5,13 @@ import {
  } from '../algorithm'
 
 function* genNextPxPosition(width, height, select) {
-  var raw = []
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      raw.push([x, y])
+  var rawPos = []
+  for (let x = width - 1; x >= 0; x--) {
+    for (let y = height - 1; y >= 0; y--) {
+      rawPos.push([x, y])
     }
   }
-
-  yield* genNextElement(raw, select)
+  yield* genNextElement(rawPos, select)
 }
 
 const drawPixel = (ctx, data, pxData, x, y) => {
@@ -24,7 +23,7 @@ const drawPixel = (ctx, data, pxData, x, y) => {
   ctx.putImageData(pxData, x, y)
 }
 
-export function* genNextBatchRender(domEl, dataSelect, posSelect, regionLength) {
+export function* genNextBatchRender(domEl, colorSelect, posSelect, regionLength) {
   const ctx = domEl.getContext('2d')
   ctx.fillStyle = 'white'
   ctx.fillRect(0, 0, domEl.width, domEl.height)
@@ -32,9 +31,9 @@ export function* genNextBatchRender(domEl, dataSelect, posSelect, regionLength) 
   const pxData = ctx.getImageData(0, 0, 1, 1)
   const colorPalette = genRgbPalette(6, 6, 6)
 
-  const dataGen = genNextElement(
+  const colorGen = genNextElement(
     colorPalette,
-    dataSelect,
+    colorSelect,
   )
 
   const posGen = genNextPxPosition(
@@ -46,14 +45,13 @@ export function* genNextBatchRender(domEl, dataSelect, posSelect, regionLength) 
   let i = 0
 
   while (1) {
-    const { value: data, done: dataDone } = dataGen.next()
+    const { value: data, done: dataDone } = colorGen.next()
     if (dataDone) {
       return
     }
 
     const [ x, y ] = posGen.next().value
-
-    // // is it necessary to use rAF here?
+    // // not necessary to use rAF here
     // window.requestAnimationFrame(
     //   () => drawPixel(ctx, data, pxData, x, y)
     // )
